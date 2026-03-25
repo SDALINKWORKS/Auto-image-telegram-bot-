@@ -7,9 +7,6 @@ logging.basicConfig(level=logging.INFO)
 
 # START COMMAND
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    args = context.args
-    campaign = args[0] if args else "default"
-
     keyboard = [
         [InlineKeyboardButton("✅ Join Channel", url=f"https://t.me/{CHANNEL_USERNAME.replace('@','')}")],
         [InlineKeyboardButton("🔓 I Joined (Unlock)", callback_data="check_join")]
@@ -29,26 +26,25 @@ async def check_join(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     user_id = query.from_user.id
 
-    member = await context.bot.get_chat_member(CHANNEL_USERNAME, user_id)
+    try:
+        member = await context.bot.get_chat_member(CHANNEL_USERNAME, user_id)
 
-    if member.status in ["member", "administrator", "creator"]:
-        # USER JOINED → UNLOCK
-        keyboard = [
-            [InlineKeyboardButton("🎰 Play Now", url=PLAY_URL)],
-            [InlineKeyboardButton("🎁 Today’s Offer", url=OFFER_URL)],
-            [InlineKeyboardButton("💬 Support", url=SUPPORT_URL)]
-        ]
+        if member.status in ["member", "administrator", "creator"]:
+            keyboard = [
+                [InlineKeyboardButton("🎰 Play Now", url=PLAY_URL)],
+                [InlineKeyboardButton("🎁 Today’s Offer", url=OFFER_URL)],
+                [InlineKeyboardButton("💬 Support", url=SUPPORT_URL)]
+            ]
 
-        text = (
-            "Unlocked 🎉\n\n"
-            "Step 2/2: Continue to the site."
-        )
+            text = "Unlocked 🎉\n\nStep 2/2: Continue to the site."
 
-        await query.answer()
-        await query.message.reply_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
+            await query.answer()
+            await query.message.reply_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
 
-    else:
-        # NOT JOINED
+        else:
+            raise Exception("Not joined")
+
+    except:
         keyboard = [
             [InlineKeyboardButton("✅ Join Channel", url=f"https://t.me/{CHANNEL_USERNAME.replace('@','')}")],
             [InlineKeyboardButton("🔓 Try Unlock Again", callback_data="check_join")]
@@ -73,6 +69,7 @@ def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(check_join, pattern="check_join"))
 
+    print("Bot is running...")
     app.run_polling()
 
 
