@@ -1,6 +1,4 @@
-import os
-
-TOKEN = os.getenv("8749400865:AAFL5J2HvTn13A6HnuqJQt_38RSGUSaYgqo")
+TOKEN = "8749400865:AAEiQc_HbSr8XcbdIF7HhKN3GhD6WmV7whw"
 
 CHANNEL_USERNAME = "@Palmernews"
 
